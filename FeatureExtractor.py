@@ -86,8 +86,8 @@ class FeatureExtractor:
 
         image_array = []
 
-        for index, row in training_data_df.iterrows():
-            image = self.__create_pixel_array(row)
+        for index, pixel_row in training_data_df.iterrows():
+            image = self.__create_pixel_array(pixel_row)
             data = []
             intensity = image.mean()
 
@@ -96,7 +96,7 @@ class FeatureExtractor:
             processed_data = self.__get_quadrants(self.image_quartering_count, binary_image)
 
             if self.k_start == 1:
-                image_array.append([row[0]] + processed_data)
+                image_array.append([pixel_row[0]] + processed_data)
             else:
                 image_array.append(processed_data)
             count_of_training += 1
@@ -108,16 +108,16 @@ class FeatureExtractor:
         """
         Splits the given image ndarray into quadrants
         """
-        nrows, ncols = binary_image.shape
+        row_count, column_count = binary_image.shape
 
         self.logger.debug(binary_image.shape)
 
-        rsplit, csplit = nrows // 2, ncols // 2
+        row_split, column_split = row_count // 2, column_count // 2
         quadrants = [
-            binary_image[:rsplit, :csplit],
-            binary_image[:rsplit, csplit:],
-            binary_image[rsplit:, :csplit],
-            binary_image[rsplit:, csplit:],
+            binary_image[:row_split, :column_split],
+            binary_image[:row_split, column_split:],
+            binary_image[row_split:, :column_split],
+            binary_image[row_split:, column_split:],
         ]
         return quadrants
 

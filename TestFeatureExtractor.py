@@ -6,6 +6,10 @@ from FeatureExtractor import FeatureExtractor
 
 
 class TestFeatureExtractor(unittest.TestCase):
+    """
+    Test for the FeatureExtractor class
+    """
+
     def test_extract_features_4x4_returns_correct_dimensions_and_colour(self):
         input_image_df = pd.read_csv(io.StringIO("label,pixel0,pixel1,pixel2,pixel3,pixel4,pixel5,pixel6,pixel7,pixel8,pixel9,pixel10,pixel11,pixel12,pixel13,pixel14,pixel15\n0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0"))
         feature_extractor = FeatureExtractor(logging.Logger("FeatureExtractor"), 4, 4, 1)

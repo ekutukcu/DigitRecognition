@@ -1,30 +1,21 @@
 import pandas as pd
 import csv
+import logging
 
 from sklearn.linear_model import LogisticRegression
 from sklearn import preprocessing
 from FeatureExtractor import FeatureExtractor
 
 if __name__ == '__main__':
-    digit_recogniser = FeatureExtractor("train.csv", 28, 28)
+    logger = logging.Logger("MainLogger")
+    digit_recogniser = FeatureExtractor(logger, 28, 28,2,True)
 
-    with open('Data/computed_image_metrics.csv', 'w', newline='') as csvfile:
-        csv_writer = csv.writer(csvfile)
-        for i   in range(len(digit_recogniser.image_array)):
-            csv_writer.writerow(digit_recogniser.image_array[i])
+    pixel_training_data_df = pd.read_csv("Data/train.csv")
+    training_feature_df = digit_recogniser.extract_features(pixel_training_data_df)
 
-    digit_recogniser = FeatureExtractor("test.csv", 28, 28, False)
-    image_arrays = digit_recogniser.extract_features("test.csv")
-
-    with open('Data/computed_test_metrics.csv', 'w', newline='') as csvfile:
-        csv_writer = csv.writer(csvfile)
-        csv_writer.writerows(image_arrays)
-
-    digit_df = pd.read_csv("Data/computed_image_metrics.csv")
-
-    print(digit_df.shape)
-    x_data = digit_df.iloc[:, 1:]
-    y_data = digit_df.iloc[:, [0]]
+    print(training_feature_df.shape)
+    x_data = training_feature_df.iloc[:, 1:]
+    y_data = training_feature_df.iloc[:, [0]]
 
     scaler = preprocessing.StandardScaler().fit(x_data)
     x_data_scaled = scaler.transform(x_data)
@@ -35,14 +26,15 @@ if __name__ == '__main__':
 
     print(f"Training completed. Accuracy Rate: {accuracy * 100}%")
 
-    test_data_file_path = "Data/computed_test_metrics.csv"
-
-    test_data_df = pd.read_csv(test_data_file_path)
-    scaler = preprocessing.StandardScaler().fit(test_data_df)
-    test_data_scaled = scaler.transform(test_data_df)
+    # create predictions for the test data now
+    pixel_test_data_df = pd.read_csv("Data/test.csv")
+    digit_recogniser = FeatureExtractor(logger, 28, 28, False)
+    test_feature_df = digit_recogniser.extract_features(pixel_test_data_df)
+    scaler = preprocessing.StandardScaler().fit(test_feature_df)
+    test_data_scaled = scaler.transform(test_feature_df)
 
     print(test_data_scaled.shape)
-    print(test_data_df.shape)
+    print(test_feature_df.shape)
 
     predictions = logistic_model.predict(test_data_scaled)
     pd.Series({"Label": predictions}).to_csv("predictions.csv")
